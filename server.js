@@ -142,6 +142,37 @@ const addEmployee = () => {
   });
 };
 
+const updateEmployeeRole = () => {
+  const sql = `SELECT first_name FROM employees;`
+  db.query(sql, (err, results) => {
+      if (err) throw err;
+
+      inquirer.prompt([
+          {
+              name: 'empl',
+              type: 'list',
+              choices: results,
+              message: 'Select an employee to update their role:'
+          },
+          {
+              name: 'newRole',
+              type: 'list',
+              choices: results
+          }
+      ]).then((answer) => {
+          db.query(`UPDATE employees 
+          SET role_id = (SELECT id FROM roles WHERE title = ? ) 
+          WHERE id = (SELECT id FROM(SELECT id FROM employees WHERE CONCAT(first_name," ",last_name) = ?) AS tmptable)`, [answer.newRole, answer.empl], (err, results) => {
+                  if (err) throw err;
+                  startApplication();
+              })
+      })
+
+
+  })
+
+}
+
 // Views all roles
 const viewAllRoles = () => {
   let sql = `SELECT * FROM roles`;
