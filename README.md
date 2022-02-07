@@ -11,6 +11,8 @@ https://github.com/cmd0160/employee_tracker
 
 ## Link to Video Demonstration
 
+https://watch.screencastify.com/v/gkbRK4vhLSQDGSWgaeGe
+
 
 ## Application Home Page
 ![Employee Tracker Home Page](img/Employee_Tracker.png)
