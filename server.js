@@ -1,6 +1,7 @@
 const mysql = require('mysql2');
 const cTable = require('console.table');
 const inquirer = require('inquirer');
+const { left } = require('inquirer/lib/utils/readline');
 require('dotenv').config();
 
 
@@ -69,7 +70,6 @@ const showAllEmployees = () => {
     ORDER BY e.id;`
     db.query(sql, (err, results) => {
         if (err) throw err;
-        console.log(' ');
         console.table(results)
         startApplication();
     })
@@ -79,7 +79,6 @@ const viewAllDepartments = () => {
     let sql = `SELECT * FROM departments`;
     db.query(sql, (err, results) => {
         if (err) throw err;
-        console.log(' ');
         console.table(results)
         startApplication();
     })
@@ -89,49 +88,47 @@ const viewAllRoles = () => {
     let sql = `SELECT * FROM roles`;
     db.query(sql, (err, results) => {
         if (err) throw err;
-        console.log(' ');
         console.table(results)
         startApplication();
     })
 }
 
-// const addEmployee = () => {
-//     // connection.query(newEmployeeQuery, (err, results) => {
-//     //     if (err) throw err;
+const addRole = () => {
+    let sql = `SELECT * FROM roles LEFT JOIN departments ON roles.id=departments.id`;
+    db.query(sql, (err, results) => {
+        if (err) throw err;
+        console.table(results);
 
-//         inquirer.prompt([
-//             {
-//                 name: 'firstName',
-//                 type: 'input',
-//                 message: 
-//             },
-//             {
-//                 name: 'lastName',
-//                 type: 'input',
-//                 message: 
-//             },
-//             {
-//                 name: 'role',
-//                 type: 'list',
-//                 choices: roleList,
-//                 message: 
-//             },
-//             {
-//                 name: 'manager',
-//                 type: 'list',
-//                 choices: ['Cory Davis', 'Britton Gream'],
-//                 message: 
+        inquirer.prompt([
+            {
+                name: 'newTitle',
+                type: 'input',
+                message: 'Enter the new Title:'
+            },
+            {
+                name: 'newSalary',
+                type: 'input',
+                message: 'Enter the salary for the new Title:'
+            },
+            {
+                name: 'dept',
+                type: 'list',
+                choices: ['Management', 'Accounting', 'Tech', 'Human Resources', 'Sales Team'],
+                message: 'Select the Department for this new Title:'
+            }
+        ]).then((answer) => {
+            db.query(
+                `INSERT INTO roles(title, salary, department_id) 
+                VALUES
+                ("${answer.newTitle}", "${answer.newSalary}", 
+                (SELECT id FROM departments WHERE department_name = "${answer.dept}"));`
+            )
+            startApplication();
 
-//             }
-//         ]).then((answer) => {
-//             db.query(
-//                 `INSERT INTO employees(first_name, last_name, role_id, manager_id) VALUES(?, ?, 
-//                 (SELECT id FROM roles WHERE title = ? ), 
-//                 (SELECT id FROM (SELECT id FROM employees WHERE CONCAT(first_name," ",last_name) = ? ) AS tmptable))`, [answer.firstName, answer.lastName, answer.role]
-//             )
-//             startApplication();
-//         })    
-//     }
+        })
+    })
+
+}
 
 
 startApplication();
