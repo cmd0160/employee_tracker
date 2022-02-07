@@ -1,8 +1,19 @@
 const mysql = require('mysql2');
 const cTable = require('console.table');
 const inquirer = require('inquirer');
-const Choices = require('inquirer/lib/objects/choices');
+const rolesQuery = 'SELECT * from roles; SELECT CONCAT (e.first_name," ",e.last_name) AS full_name FROM employees e'
+
+
 require('dotenv').config();
+const employeeQuery_all = 
+    `SELECT e.id, e.first_name AS "First Name", e.last_name AS "Last Name", r.title AS "Title", d.department_name AS "Department", IFNULL(r.salary, 'No Data') AS "Salary", CONCAT(m.first_name," ",m.last_name) AS "Manager"
+    FROM employees e
+    LEFT JOIN roles r 
+    ON r.id = e.role_id 
+    LEFT JOIN departments d 
+    ON d.id = r.department_id
+    LEFT JOIN employees m ON m.id = e.manager_id
+    ORDER BY e.id;`
 
 // Connection to the database
 const connection = mysql.createConnection({
@@ -55,4 +66,17 @@ const startApplication = () => {
         }
     })
 }
+
+const showAllEmployees = () => {
+    connection.query(employeeQuery_all, (err, results) => {
+        if (err) throw err;
+        console.log(' ');
+        console.table(results)
+        startApplication();
+    })
+
+}
+
+
+
 startApplication();
